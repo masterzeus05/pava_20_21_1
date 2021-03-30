@@ -63,8 +63,13 @@ public class SimpleTest {
     }
 
     @Test(dataProvider = "drawOperations", description="OperationDraw")
-    public void shouldEqualString(Device device, Shape shape, String result) {
-        assertEquals(result, UsingMultipleDispatch.invoke(device,"draw", shape));
+    public void simpleTest(Device device, Shape shape, String result) {
+        assertEquals(UsingMultipleDispatch.invoke(device,"draw", shape), result);
+    }
+
+    @Test(dataProvider = "drawOperations", description="OperationDraw")
+    public void simpleTestOnExtended(Device device, Shape shape, String result) {
+        assertEquals(UsingMultipleDispatch.invoke(device,"draw", shape), result);
     }
 }
 

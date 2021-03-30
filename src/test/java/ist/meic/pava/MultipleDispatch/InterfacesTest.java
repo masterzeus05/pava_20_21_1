@@ -8,14 +8,14 @@ import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
-public class ComplexTest {
+public class InterfacesTest {
 
-    public static class Shape {}
-    public static class Line extends Shape {}
-    public static class Circle extends Shape {}
-    public static class Brush {}
-    public static class Pencil extends Brush {}
-    public static class Crayon extends Brush {}
+    public interface Shape {}
+    public static class Line implements Shape {}
+    public static class Circle implements Shape {}
+    public interface Brush {}
+    public static class Pencil implements Brush {}
+    public static class Crayon implements Brush {}
     public static class Device {
         public String draw(Shape s, Brush b) {
             return "draw what where and with what?";
@@ -59,24 +59,19 @@ public class ComplexTest {
     @DataProvider
     private Object[][] drawOperations() {
         return new Object[][] {
-                {new Screen(), new Line(), new Pencil(), new Screen().draw(new Line(), new Pencil()) },
-                {new Screen(), new Line(), new Crayon(), new Screen().draw(new Line(), new Crayon()) },
-                {new Screen(), new Circle(), new Pencil(), new Screen().draw(new Circle(), new Pencil()) },
-                {new Screen(), new Circle(), new Crayon(), new Screen().draw(new Circle(), new Crayon()) },
-                {new Printer(), new Line(), new Pencil(), new Printer().draw(new Line(), new Pencil()) },
-                {new Printer(), new Line(), new Crayon(), new Printer().draw(new Line(), new Crayon()) },
-                {new Printer(), new Circle(), new Pencil(), new Printer().draw(new Circle(), new Pencil()) },
-                {new Printer(), new Circle(), new Crayon(), new Printer().draw(new Circle(), new Crayon()) },
+            {new Screen(), new Line(), new Pencil(), new Screen().draw(new Line(), new Pencil()) },
+            {new Screen(), new Line(), new Crayon(), new Screen().draw(new Line(), new Crayon()) },
+            {new Screen(), new Circle(), new Pencil(), new Screen().draw(new Circle(), new Pencil()) },
+            {new Screen(), new Circle(), new Crayon(), new Screen().draw(new Circle(), new Crayon()) },
+            {new Printer(), new Line(), new Pencil(), new Printer().draw(new Line(), new Pencil()) },
+            {new Printer(), new Line(), new Crayon(), new Printer().draw(new Line(), new Crayon()) },
+            {new Printer(), new Circle(), new Pencil(), new Printer().draw(new Circle(), new Pencil()) },
+            {new Printer(), new Circle(), new Crayon(), new Printer().draw(new Circle(), new Crayon()) },
         };
     }
 
     @Test(dataProvider = "drawOperations", description="OperationDraw")
-    public void complexTest(Device device, Shape shape, Brush brush, String result) {
-        assertEquals(UsingMultipleDispatch.invoke(device,"draw", shape, brush), result);
-    }
-
-    @Test(dataProvider = "drawOperations", description="OperationDraw")
-    public void complexTestExtended(Device device, Shape shape, Brush brush, String result) {
+    public void interfacesTestExtended(Device device, Shape shape, Brush brush, String result) {
         assertEquals(UsingMultipleDispatchExtended.invoke(device,"draw", shape, brush), result);
     }
 }

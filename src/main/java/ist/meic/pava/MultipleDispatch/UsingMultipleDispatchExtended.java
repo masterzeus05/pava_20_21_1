@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class UsingMultipleDispatch {
+public class UsingMultipleDispatchExtended {
     public static Object invoke(Object receiver, String name, Object... args) {
         try {
             Method method = bestMethod(receiver.getClass(), name,
@@ -34,10 +34,22 @@ public class UsingMultipleDispatch {
         }
         for (int j = 0; j < node.args.length; j++) {
             if (node.level[j] == lowestLevel && node.args[j] != Object.class) {
+                Class currClass = node.args[j];
                 Node newNode = new Node(node.args.clone(), node.level.clone());
 
                 newNode.args[j] = newNode.args[j].getSuperclass();
                 newNode.level[j]++;
+
+                // FIXME: Test this!!!
+                // Get interfaces
+                for (Class currInterface : currClass.getInterfaces()) {
+                    Node interNode = new Node(node.args.clone(), node.level.clone());
+
+                    interNode.args[j] = currInterface;
+                    interNode.level[j]++;
+                    res.add(interNode);
+                }
+
                 res.add(newNode);
             }
         }
