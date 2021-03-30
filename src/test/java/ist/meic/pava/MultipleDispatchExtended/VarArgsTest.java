@@ -1,9 +1,6 @@
-package ist.meic.pava.MultipleDispatch;
+package ist.meic.pava.MultipleDispatchExtended;
 
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
 
 public class VarArgsTest {
     static class Shape { }

@@ -1,4 +1,4 @@
-package ist.meic.pava.MultipleDispatch;
+package ist.meic.pava.MultipleDispatchExtended;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

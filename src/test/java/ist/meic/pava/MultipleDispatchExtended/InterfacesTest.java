@@ -1,10 +1,7 @@
-package ist.meic.pava.MultipleDispatch;
+package ist.meic.pava.MultipleDispatchExtended;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
@@ -72,6 +69,6 @@ public class InterfacesTest {
 
     @Test(dataProvider = "drawOperations", description="OperationDraw")
     public void interfacesTestExtended(Device device, Shape shape, Brush brush, String result) {
-        assertEquals(UsingMultipleDispatchExtended.invoke(device,"draw", shape, brush), result);
+        assertEquals(UsingMultipleDispatch.invoke(device,"draw", shape, brush), result);
     }
 }

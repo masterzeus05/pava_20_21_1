@@ -27,13 +27,8 @@ public class UsingMultipleDispatch {
 
     private static List<Node> generateNode(Node node) {
         List<Node> res = new LinkedList<>();
-        int lowestLevel = node.level[0];
-        for (int i = 0; i < node.level.length; i++) {
-            int tmp = node.level[i];
-            if (tmp < lowestLevel) lowestLevel = tmp;
-        }
-        for (int j = 0; j < node.args.length; j++) {
-            if (node.level[j] == lowestLevel && node.args[j] != Object.class) {
+        for (int j = (node.args.length - 1); j >= 0; j--) {
+            if (node.args[j] != Object.class) {
                 Node newNode = new Node(node.args.clone(), node.level.clone());
 
                 newNode.args[j] = newNode.args[j].getSuperclass();

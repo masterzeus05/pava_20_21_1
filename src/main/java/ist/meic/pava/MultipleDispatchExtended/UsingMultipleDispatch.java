@@ -1,10 +1,10 @@
-package ist.meic.pava.MultipleDispatch;
+package ist.meic.pava.MultipleDispatchExtended;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class UsingMultipleDispatchExtended {
+public class UsingMultipleDispatch {
     public static Object invoke(Object receiver, String name, Object... args) {
         try {
             Method method = bestMethod(receiver.getClass(), name,
@@ -27,20 +27,14 @@ public class UsingMultipleDispatchExtended {
 
     private static List<Node> generateNode(Node node) {
         List<Node> res = new LinkedList<>();
-        int lowestLevel = node.level[0];
-        for (int i = 0; i < node.level.length; i++) {
-            int tmp = node.level[i];
-            if (tmp < lowestLevel) lowestLevel = tmp;
-        }
-        for (int j = 0; j < node.args.length; j++) {
-            if (node.level[j] == lowestLevel && node.args[j] != Object.class) {
+        for (int j = (node.args.length - 1); j >= 0; j--) {
+            if (node.args[j] != Object.class) {
                 Class currClass = node.args[j];
                 Node newNode = new Node(node.args.clone(), node.level.clone());
 
                 newNode.args[j] = newNode.args[j].getSuperclass();
                 newNode.level[j]++;
 
-                // FIXME: Test this!!!
                 // Get interfaces
                 for (Class currInterface : currClass.getInterfaces()) {
                     Node interNode = new Node(node.args.clone(), node.level.clone());
@@ -60,7 +54,7 @@ public class UsingMultipleDispatchExtended {
         try {
             return receiverType.getMethod(name, argType);
         } catch (NoSuchMethodException e) {
-            // Search in breadth -> left to right arguments
+            // Search in breadth -> right to left arguments
             Node initialNode = new Node(argType, new int[argType.length]);
 
             List<Node> visited = new LinkedList<>();
@@ -73,6 +67,7 @@ public class UsingMultipleDispatchExtended {
                 currNode = queue.remove(0);
 
                 List<Node> adjs = generateNode(currNode);
+                // System.out.println(Arrays.toString(adjs.stream().map(n -> Arrays.toString(n.level)).toArray()));
 
                 for (Node next : adjs) {
                     if (visited.stream().noneMatch(node -> Arrays.equals(node.level, next.level))) {
@@ -82,6 +77,9 @@ public class UsingMultipleDispatchExtended {
                             visited.add(next);
                             queue.add(next);
                         }
+
+                        visited.add(next);
+                        queue.add(next);
                     }
                 }
             }
