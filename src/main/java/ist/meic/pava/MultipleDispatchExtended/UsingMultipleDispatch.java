@@ -71,7 +71,19 @@ public class UsingMultipleDispatch {
         return res;
     }
 
-    // TODO: Replace isAssignableFrom with something that can ignore autoboxing
+    private static boolean checkBoxingAndUnboxing(Class methodParam, Class argType) {
+        return (methodParam.isPrimitive() && !argType.isPrimitive() && Array.get(Array.newInstance(methodParam, 1), 0).getClass() == argType) || 
+            (!methodParam.isPrimitive() && argType.isPrimitive() && Array.get(Array.newInstance(argType, 1), 0).getClass() == methodParam);
+    }
+
+    private static boolean notAssignable(Class methodParam, Class argType) {
+        return !methodParam.isAssignableFrom(argType) && !checkBoxingAndUnboxing(methodParam, argType);
+    }
+
+    private static boolean notEquals(Class methodParam, Class argType) {
+        return !methodParam.equals(argType) && !checkBoxingAndUnboxing(methodParam, argType);
+    }
+
     private static Method[] filterMethods(Method[] initialMethods, String methodName, Class... argType) {
         return Arrays.stream(initialMethods).filter(m -> {
             if (!m.getName().equals(methodName)) return false;
@@ -81,7 +93,7 @@ public class UsingMultipleDispatch {
                 // Check until varArg parameter if everything is assignable
                 int i = 0;
                 for (; i < (params.length - 1); i++) {
-                    if (!params[i].isAssignableFrom(argType[i])) return false;
+                    if (notAssignable(params[i], argType[i])) return false;
                 }
 
                 // Check if last parameter is varArg
@@ -90,7 +102,7 @@ public class UsingMultipleDispatch {
                 Class varArgType = params[i].getComponentType();
                 // Check if remaining given arguments are of this component type
                 for (int j = i; j < argType.length; j++) {
-                    if (!varArgType.isAssignableFrom(argType[j])) return false;
+                    if (notAssignable(varArgType, argType[j])) return false;
                 }
             } else {
 
@@ -99,14 +111,13 @@ public class UsingMultipleDispatch {
 
                 // For each parameter check if we can assign from the given types
                 for (int i = 0; i < params.length; i++) {
-                    if (!params[i].isAssignableFrom(argType[i])) return false;
+                    if (notAssignable(params[i], argType[i])) return false;
                 }
             }
             return true;
         }).toArray(Method[]::new);
     }
 
-    // TODO: check for autoboxing
     private static Method matchMethod(Method[] methods, Class... argType) throws NoSuchMethodException {
         return Arrays.stream(methods).filter(m -> {
             Class[] params = m.getParameterTypes();
@@ -115,7 +126,7 @@ public class UsingMultipleDispatch {
                 // Check until varArg parameter if everything is assignable
                 int i = 0;
                 for (; i < (params.length - 1); i++) {
-                    if (!params[i].equals(argType[i])) return false;
+                    if (notEquals(params[i], argType[i])) return false;
                 }
 
                 // Check if last parameter is varArg
@@ -124,7 +135,7 @@ public class UsingMultipleDispatch {
                 Class varArgType = params[i].getComponentType();
                 // Check if remaining given arguments are of this component type
                 for (int j = i; j < argType.length; j++) {
-                    if (!varArgType.equals(argType[j])) return false;
+                    if (notEquals(varArgType, argType[j])) return false;
                 }
             } else {
 
@@ -133,7 +144,7 @@ public class UsingMultipleDispatch {
 
                 // For each parameter check if we can assign from the given types
                 for (int i = 0; i < params.length; i++) {
-                    if (!params[i].equals(argType[i])) return false;
+                    if (notEquals(params[i], argType[i])) return false;
                 }
             }
             return true;

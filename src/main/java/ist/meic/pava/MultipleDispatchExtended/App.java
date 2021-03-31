@@ -1,7 +1,5 @@
 package ist.meic.pava.MultipleDispatchExtended;
 
-import ist.meic.pava.MultipleDispatch.UsingMultipleDispatch;
-
 /**
  * Hello world!
  *
