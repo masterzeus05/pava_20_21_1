@@ -1,6 +1,9 @@
 package ist.meic.pava.MultipleDispatchExtended;
 
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 public class VarArgsTest {
     static class Shape { }
@@ -8,43 +11,43 @@ public class VarArgsTest {
     static class Circle extends Shape { }
 
     static class Device {
-        public String draw(Shape s, int... args) {
+        public String draw(Shape s, Integer... args) {
             return "draw what where? with " + args.length;
         }
 
-        public String draw(Line l, int... args) {
+        public String draw(Line l, Integer... args) {
             return "draw a line where? with " + args.length;
         }
 
-        public String draw(Circle c, int... args) {
+        public String draw(Circle c, Integer... args) {
             return "draw a circle where? with " + args.length;
         }
     }
 
     static class Screen extends Device {
-        public String draw(Shape s, int... args) {
+        public String draw(Shape s, Integer... args) {
             return "draw what on screen? with " + args.length;
         }
 
-        public String draw(Line l, int... args) {
+        public String draw(Line l, Integer... args) {
             return "drawing a line on screen! with " + args.length;
         }
 
-        public String draw(Circle c, int... args) {
+        public String draw(Circle c, Integer... args) {
             return "drawing a circle on screen! with " + args.length;
         }
     }
 
     static class Printer extends Device {
-        public String draw(Shape s, int... args) {
+        public String draw(Shape s, Integer... args) {
             return "draw what on screen? with " + args.length;
         }
 
-        public String draw(Line l, int... args) {
+        public String draw(Line l, Integer... args) {
             return "drawing a line on printer! with " + args.length;
         }
 
-        public String draw(Circle c, int... args) {
+        public String draw(Circle c, Integer... args) {
             return "drawing a circle on printer! with " + args.length;
         }
     }
@@ -59,9 +62,9 @@ public class VarArgsTest {
         };
     }
 
-    // @Test(dataProvider = "drawOperations", description="OperationDraw")
-    // public void varArgsTestExtended(Device device, Shape shape, String result) {
-    //     assertEquals(UsingMultipleDispatchExtended.invoke(device,"draw", shape, 0, 1, 2, 3), result);
-    // }
+    @Test(dataProvider = "drawOperations", description="OperationDraw")
+    public void varArgsTestExtended(Device device, Shape shape, String result) {
+        assertEquals(UsingMultipleDispatch.invoke(device,"draw", shape, 0, 1, 2, 3), result);
+    }
 }
 
