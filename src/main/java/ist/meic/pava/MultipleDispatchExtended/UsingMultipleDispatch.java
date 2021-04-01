@@ -6,6 +6,15 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class UsingMultipleDispatch {
+    
+    /** 
+     * Invokes a given method using dynamic dispatch for the arguments.
+     * 
+     * @param receiver Receiver Object
+     * @param name Receiver method name
+     * @param args Arguments for the method
+     * @return Object Method invocation
+     */
     public static Object invoke(Object receiver, String name, Object... args) {
         try {
             Method method = bestMethod(receiver.getClass(), name,
@@ -46,6 +55,14 @@ public class UsingMultipleDispatch {
         }
     }
 
+    
+    /** 
+     * Generates new nodes from a given Node. The generated nodes are created by iterating the arguments and 
+     * getting the Super Class or the Interface of an argument at a time.
+     * 
+     * @param node Node to generate new nodes from
+     * @return List<Node> List containing all generated Nodes
+     */
     private static List<Node> generateNode(Node node) {
         List<Node> res = new LinkedList<>();
         for (int j = (node.args.length - 1); j >= 0; j--) {
@@ -71,19 +88,55 @@ public class UsingMultipleDispatch {
         return res;
     }
 
-    private static boolean checkBoxingAndUnboxing(Class methodParam, Class argType) {
-        return (methodParam.isPrimitive() && !argType.isPrimitive() && Array.get(Array.newInstance(methodParam, 1), 0).getClass() == argType) || 
-            (!methodParam.isPrimitive() && argType.isPrimitive() && Array.get(Array.newInstance(argType, 1), 0).getClass() == methodParam);
+    
+    /** 
+     * Verifies if boxing or unboxing can be performed.
+     * 
+     * @param methodArg Method's argument class
+     * @param argType Class of the argument being invoked
+     * @return boolean If wether or not boxing or unboxing can be performed
+     */
+    private static boolean checkBoxingAndUnboxing(Class methodArg, Class argType) {
+        return (methodArg.isPrimitive() && !argType.isPrimitive() && Array.get(Array.newInstance(methodArg, 1), 0).getClass() == argType) || 
+            (!methodArg.isPrimitive() && argType.isPrimitive() && Array.get(Array.newInstance(argType, 1), 0).getClass() == methodArg);
     }
 
-    private static boolean notAssignable(Class methodParam, Class argType) {
-        return !methodParam.isAssignableFrom(argType) && !checkBoxingAndUnboxing(methodParam, argType);
+    
+    /** 
+     * Verifies if the it is not possible to assign the method's argument to the given one, and if the
+     * boxing and unboxing are also not possible.
+     * 
+     * @param methodArg Method's argument class
+     * @param argType Class of the argument being invoked
+     * @return boolean True if it is not assignable and the boxing is impossible, false otherwise
+     */
+    private static boolean notAssignable(Class methodArg, Class argType) {
+        return !methodArg.isAssignableFrom(argType) && !checkBoxingAndUnboxing(methodArg, argType);
     }
 
-    private static boolean notEquals(Class methodParam, Class argType) {
-        return !methodParam.equals(argType) && !checkBoxingAndUnboxing(methodParam, argType);
+    
+    /** 
+     * Verifies if the it the method's argument is not equals and the boxing and unboxing are not possible
+     * for the given argument.
+     * 
+     * @param methodArg
+     * @param argType
+     * @return boolean True if it is not equal and the boxing is impossible, false otherwise
+     */
+    private static boolean notEquals(Class methodArg, Class argType) {
+        return !methodArg.equals(argType) && !checkBoxingAndUnboxing(methodArg, argType);
     }
 
+    
+    /** 
+     * Finds the possible methods for the given arguments and method name in the provided 
+     * array of methods.
+     * 
+     * @param initialMethods Array containing the methods to be filtered
+     * @param methodName Method name to be found
+     * @param argType Arguments for the chosen method name
+     * @return Method[] Array containing all the matches
+     */
     private static Method[] filterMethods(Method[] initialMethods, String methodName, Class... argType) {
         return Arrays.stream(initialMethods).filter(m -> {
             if (!m.getName().equals(methodName)) return false;
@@ -118,6 +171,15 @@ public class UsingMultipleDispatch {
         }).toArray(Method[]::new);
     }
 
+    
+    /** 
+     * Finds the best method given a array of methods with the same name and arguments.
+     * 
+     * @param methods Array containing methods with the same name
+     * @param argType Arguments' classes for the desired method
+     * @return Method Most specific method in the given array
+     * @throws NoSuchMethodException Thrown if there is no compatible method
+     */
     private static Method matchMethod(Method[] methods, Class... argType) throws NoSuchMethodException {
         return Arrays.stream(methods).filter(m -> {
             Class[] params = m.getParameterTypes();
@@ -151,6 +213,17 @@ public class UsingMultipleDispatch {
         }).findFirst().orElseThrow(NoSuchMethodException::new);
     }
 
+    
+    /** 
+     * Finds the most specific method given the receiver type, the name of the method
+     * and the arguments' type.
+     * 
+     * @param receiverType The class of the receiver type
+     * @param name The name of the method
+     * @param argType Type of the arguments
+     * @return Method Most specific method
+     * @throws NoSuchMethodException Thrown if there is no method compatible with the given arguments
+     */
     private static Method bestMethod(Class receiverType, String name, Class... argType) throws NoSuchMethodException {
         Method[] methods = filterMethods(receiverType.getMethods(), name, argType);
         try {
@@ -169,7 +242,6 @@ public class UsingMultipleDispatch {
                 currNode = queue.remove(0);
 
                 List<Node> adjs = generateNode(currNode);
-                // System.out.println(Arrays.toString(adjs.stream().map(n -> Arrays.toString(n.level)).toArray()));
 
                 for (Node next : adjs) {
                     if (visited.stream().noneMatch(node -> Arrays.equals(node.level, next.level))) {

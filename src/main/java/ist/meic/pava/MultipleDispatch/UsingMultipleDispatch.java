@@ -5,6 +5,15 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class UsingMultipleDispatch {
+    
+    /** 
+     * Invokes a given method using dynamic dispatch for the arguments.
+     * 
+     * @param receiver Receiver Object
+     * @param name Receiver method name
+     * @param args Arguments for the method
+     * @return Object Method invocation
+     */
     public static Object invoke(Object receiver, String name, Object... args) {
         try {
             Method method = bestMethod(receiver.getClass(), name,
@@ -25,6 +34,14 @@ public class UsingMultipleDispatch {
         }
     }
 
+    
+    /** 
+     * Generates new nodes from a given Node. The generated nodes are created by iterating the arguments and 
+     * getting the Super Class of an argument at a time.
+     * 
+     * @param node Node to generate new nodes from
+     * @return List<Node> List containing all generated Nodes
+     */
     private static List<Node> generateNode(Node node) {
         List<Node> res = new LinkedList<>();
         for (int j = (node.args.length - 1); j >= 0; j--) {
@@ -39,6 +56,16 @@ public class UsingMultipleDispatch {
         return res;
     }
 
+    
+    /** 
+     * Finds the best method, the most specific, for the given arguments.
+     * 
+     * @param receiverType The type of the receiver Object
+     * @param name The name of the receiver's method to be invoked
+     * @param argType All the argument types
+     * @return Method Most specific method for the given arguments
+     * @throws NoSuchMethodException If there is no compatible method for the arguments
+     */
     private static Method bestMethod(Class receiverType, String name, Class... argType) throws NoSuchMethodException {
         try {
             return receiverType.getMethod(name, argType);
