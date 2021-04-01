@@ -11,6 +11,7 @@ public class AutoBoxingTest {
     static class Circle extends Shape { }
     static class Rectangle extends Shape { }
     static class Square extends Shape { }
+    static class Triangle extends Shape { }
 
     static class Device {
         public String draw(Shape s, int args) {
@@ -31,6 +32,10 @@ public class AutoBoxingTest {
 
         public String draw(Square c, Short args) {
             return "draw a square where? with " + args;
+        }
+
+        public String draw(Triangle c, Integer... args) {
+            return "draw a triangle where? with " + args.length;
         }
     }
 
@@ -54,6 +59,10 @@ public class AutoBoxingTest {
         public String draw(Square c, Short args) {
             return "draw a square on screen! with " + args;
         }
+
+        public String draw(Triangle c, Integer... args) {
+            return "draw a triangle on screen! with " + args.length;
+        }
     }
 
     static class Printer extends Device {
@@ -75,6 +84,10 @@ public class AutoBoxingTest {
 
         public String draw(Square c, Short args) {
             return "draw a square on printer! with " + args;
+        }
+
+        public String draw(Triangle c, Integer... args) {
+            return "draw a triangle on printer! with " + args.length;
         }
     }
 
@@ -130,6 +143,21 @@ public class AutoBoxingTest {
     public void boxingExtendedShort(Device device, Shape shape, String result) {
         short value = 0;
         assertEquals(UsingMultipleDispatch.invoke(device,"draw", shape, value), result);
+    }
+
+    @DataProvider
+    private Object[][] drawOperationsVarArgs() {
+        Integer val = 0;
+        return new Object[][] {
+                {new Screen(), new Triangle(), new Screen().draw(new Triangle(), val, val, val)},
+                {new Printer(), new Triangle(), new Printer().draw(new Triangle(), val, val, val)},
+        };
+    }
+
+    @Test(dataProvider = "drawOperationsVarArgs", description="OperationDraw")
+    public void boxingExtendedVarArgs(Device device, Shape shape, String result) {
+        int val = 0;
+        assertEquals(UsingMultipleDispatch.invoke(device,"draw", shape, val, val, val), result);
     }
 }
 
