@@ -90,15 +90,21 @@ public class UsingMultipleDispatch {
 
     
     /** 
-     * Verifies if boxing or unboxing can be performed.
+     * Verifies if boxing can be performed.
      * 
-     * @param methodArg Method's argument class
-     * @param argType Class of the argument being invoked
-     * @return boolean If wether or not boxing or unboxing can be performed
+     * @param class1
+     * @param class2
+     * @return boolean If wether or not boxing can be performed
      */
-    private static boolean checkBoxingAndUnboxing(Class methodArg, Class argType) {
-        return (methodArg.isPrimitive() && !argType.isPrimitive() && Array.get(Array.newInstance(methodArg, 1), 0).getClass() == argType) || 
-            (!methodArg.isPrimitive() && argType.isPrimitive() && Array.get(Array.newInstance(argType, 1), 0).getClass() == methodArg);
+    private static boolean checkBoxing(Class class1, Class class2) {
+        return (class1.equals(boolean.class) && class2.equals(Boolean.class)) ||
+            (class1.equals(byte.class) && class2.equals(Byte.class)) ||
+            (class1.equals(char.class) && class2.equals(Character.class)) ||
+            (class1.equals(float.class) && class2.equals(Float.class)) ||
+            (class1.equals(int.class) && class2.equals(Integer.class)) ||
+            (class1.equals(long.class) && class2.equals(Long.class)) ||
+            (class1.equals(short.class) && class2.equals(Short.class)) ||
+            (class1.equals(double.class) && class2.equals(Double.class));
     }
 
     
@@ -111,7 +117,7 @@ public class UsingMultipleDispatch {
      * @return boolean True if it is not assignable and the boxing is impossible, false otherwise
      */
     private static boolean notAssignable(Class methodArg, Class argType) {
-        return !methodArg.isAssignableFrom(argType) && !checkBoxingAndUnboxing(methodArg, argType);
+        return !methodArg.isAssignableFrom(argType) && !checkBoxing(methodArg, argType) && !checkBoxing(argType, methodArg);
     }
 
     
@@ -124,7 +130,7 @@ public class UsingMultipleDispatch {
      * @return boolean True if it is not equal and the boxing is impossible, false otherwise
      */
     private static boolean notEquals(Class methodArg, Class argType) {
-        return !methodArg.equals(argType) && !checkBoxingAndUnboxing(methodArg, argType);
+        return !methodArg.equals(argType) && !checkBoxing(methodArg, argType) && !checkBoxing(argType, methodArg);
     }
 
     
